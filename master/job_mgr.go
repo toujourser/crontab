@@ -21,7 +21,7 @@ var (
 	G_JobMgr *JobMgr
 )
 
-func InitJonMgr() (err error) {
+func InitJobMgr() (err error) {
 	var (
 		config clientv3.Config
 		client *clientv3.Client
