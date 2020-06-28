@@ -10,7 +10,7 @@ require (
 	github.com/gogo/protobuf v1.3.1 // indirect
 	github.com/golang/protobuf v1.4.2 // indirect
 	github.com/google/uuid v1.1.1 // indirect
-	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75 // indirect
+	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
 	github.com/klauspost/compress v1.10.8 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/spf13/cast v1.3.1
