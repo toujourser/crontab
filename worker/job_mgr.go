@@ -3,6 +3,7 @@ package worker
 import (
 	"context"
 	"crontab/common"
+	"fmt"
 	"log"
 	"time"
 
@@ -49,6 +50,9 @@ func InitJobMgr() (err error) {
 	}
 	// 启动任务监听
 	G_JobMgr.watchJobs()
+	for {
+		time.Sleep(time.Second * 1)
+	}
 	return
 }
 
@@ -60,7 +64,7 @@ func (jobMgr *JobMgr) watchJobs() (err error) {
 		watchStartRevision int64
 		watchChan          clientv3.WatchChan
 		wathchResp         clientv3.WatchResponse
-		watchEvent         clientv3.Event
+		watchEvent         *clientv3.Event
 		jobName            string
 		jobEvent           *common.JobEvent
 	)
@@ -72,16 +76,19 @@ func (jobMgr *JobMgr) watchJobs() (err error) {
 		if job, err = common.UnpackJob(kvpair.Value); err == nil {
 			//TODO: 将这个任务调度给scheduler（调度协程）
 			jobEvent = common.BuildJobEvent(common.JOB_EVENT_SAVE, job)
+			G_Scheduler.PushJobEvent(jobEvent)
+			log.Println(*jobEvent)
+			fmt.Printf("%+v\n", "------------------")
 		}
 	}
 
 	go func() {
 		// 从get时刻的后续版本开始监听
 		watchStartRevision = getResp.Header.Revision + 1
-		watchChan = jobMgr.wathcer.Watch(context.TODO(), common.JOB_SAVE_DIR, clientv3.WithRev(watchStartRevision))
+		watchChan = jobMgr.wathcer.Watch(context.TODO(), common.JOB_SAVE_DIR, clientv3.WithRev(watchStartRevision), clientv3.WithPrefix())
 
 		for wathchResp = range watchChan {
-			for watchEvent = range wathchResp.Events {
+			for _, watchEvent = range wathchResp.Events {
 				switch watchEvent.Type {
 				case mvccpb.PUT:
 					if job, err = common.UnpackJob(watchEvent.Kv.Value); err != nil {
@@ -97,10 +104,11 @@ func (jobMgr *JobMgr) watchJobs() (err error) {
 					jobEvent = common.BuildJobEvent(common.JOB_EVENT_DELETE, job)
 				}
 				// todo: 推送给scheduler
-				// G_Scheduler.PushJobEvent(jobEvent)
-
+				G_Scheduler.PushJobEvent(jobEvent)
+				log.Println(*jobEvent)
+				fmt.Printf("%+v\n", "***********************")
 			}
 		}
 	}()
-
+	return
 }

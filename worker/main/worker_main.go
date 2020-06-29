@@ -13,7 +13,7 @@ var (
 
 func initArgs() {
 	// worker -config ./worker.json
-	flag.StringVar(&configFile, "config", "/Users/mds/Documents/study/go/crontab/worker/main/worker.json", "指定配置文件地址")
+	flag.StringVar(&configFile, "config", "D:\\study\\proj\\go_pro\\crontab\\worker\\main\\worker.json", "指定配置文件地址")
 	flag.Parse()
 }
 
@@ -31,6 +31,11 @@ func main() {
 	if err = worker.InitConfig(configFile); err != nil {
 		goto ERR
 	}
+
+	if err = worker.InitScheduler(); err != nil {
+		goto ERR
+	}
+
 	if err = worker.InitJobMgr(); err != nil {
 		goto ERR
 	}
