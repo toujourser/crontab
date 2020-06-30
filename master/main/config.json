@@ -3,10 +3,10 @@
   "apiReadTimeout": 5000,
   "apiWriteTimeout": 5000,
   "etcdEndPoints": [
-    "192.168.255.129:2379"
+    "127.0.0.1:2379"
   ],
   "etcdDialTimeout": 5000,
-  "webroot": "D:\\study\\proj\\go_pro\\crontab\\master\\web\\static"
+  "webroot": "/Users/mds/Documents/study/go/crontab/master/web/static"
 }
 
 

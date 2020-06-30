@@ -2,9 +2,10 @@ package common
 
 import (
 	"encoding/json"
-	"github.com/gorhill/cronexpr"
 	"strings"
 	"time"
+
+	"github.com/gorhill/cronexpr"
 )
 
 // 定时任务
@@ -71,16 +72,31 @@ func BuildJobEvent(eventType int, job *Job) (jobEvent *JobEvent) {
 	}
 }
 
-func BuildJobSchedulerPlan(job *Job) (jobSchedulePaln *JobSchedulerPlan, err error) {
+func BuildJobSchedulerPlan(job *Job) (jobSchedulePlan *JobSchedulerPlan, err error) {
 	var expr *cronexpr.Expression
 
 	if expr, err = cronexpr.Parse(job.CronExpr); err != nil {
 		return
 	}
-	jobSchedulePaln = &JobSchedulerPlan{
+	jobSchedulePlan = &JobSchedulerPlan{
 		Job:      job,
 		Expr:     expr,
 		NextTime: expr.Next(time.Now()),
+	}
+	return
+}
+
+type JobExecuteInfo struct {
+	Job      *Job
+	PlanTime time.Time // 理论的执行时间
+	RealTime time.Time // 实际的执行时间
+}
+
+func BuildExecuteInfo(jobSchedulerPlan *JobSchedulerPlan) (jobExecteInfo *JobExecuteInfo) {
+	jobExecteInfo = &JobExecuteInfo{
+		Job:      jobSchedulerPlan.Job,
+		PlanTime: jobSchedulerPlan.NextTime,
+		RealTime: time.Now(),
 	}
 	return
 }

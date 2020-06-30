@@ -15,7 +15,7 @@ type JobMgr struct {
 	client  *clientv3.Client
 	kv      clientv3.KV
 	lease   clientv3.Lease
-	wathcer clientv3.Watcher
+	watcher clientv3.Watcher
 }
 
 var (
@@ -46,7 +46,7 @@ func InitJobMgr() (err error) {
 		client:  client,
 		kv:      kv,
 		lease:   lease,
-		wathcer: watcher,
+		watcher: watcher,
 	}
 	// 启动任务监听
 	G_JobMgr.watchJobs()
@@ -85,7 +85,7 @@ func (jobMgr *JobMgr) watchJobs() (err error) {
 	go func() {
 		// 从get时刻的后续版本开始监听
 		watchStartRevision = getResp.Header.Revision + 1
-		watchChan = jobMgr.wathcer.Watch(context.TODO(), common.JOB_SAVE_DIR, clientv3.WithRev(watchStartRevision), clientv3.WithPrefix())
+		watchChan = jobMgr.watcher.Watch(context.TODO(), common.JOB_SAVE_DIR, clientv3.WithRev(watchStartRevision), clientv3.WithPrefix())
 
 		for wathchResp = range watchChan {
 			for _, watchEvent = range wathchResp.Events {
