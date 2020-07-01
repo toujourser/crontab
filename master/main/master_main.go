@@ -12,7 +12,7 @@ var (
 )
 
 func initArgs() {
-	flag.StringVar(&configFile, "config", "master/main/config.json", "指定配置文件地址")
+	flag.StringVar(&configFile, "config", "D:\\study\\proj\\go_pro\\crontab\\master\\main\\config.json", "指定配置文件地址")
 	flag.Parse()
 }
 

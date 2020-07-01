@@ -14,7 +14,7 @@ var (
 
 func initArgs() {
 	// worker -config ./worker.json
-	flag.StringVar(&configFile, "config", "/Users/mds/Documents/study/go/crontab/worker/main/worker.json", "指定配置文件地址")
+	flag.StringVar(&configFile, "config", "worker/main/worker.json", "指定配置文件地址")
 	flag.Parse()
 }
 
@@ -30,6 +30,11 @@ func main() {
 	initEnv()
 
 	if err = worker.InitConfig(configFile); err != nil {
+		goto ERR
+	}
+
+	// 启动日志协程
+	if err = worker.InitLogSink(); err != nil {
 		goto ERR
 	}
 
