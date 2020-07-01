@@ -2,5 +2,6 @@
   "etcdEndPoints": [
     "127.0.0.1:2379"
   ],
-  "etcdDialTimeout": 5000
+  "etcdDialTimeout": 5000,
+  "mongodbURI": "mongodb://crontab:goodluck@127.0.0.1:27017/crontab?authMechanism=SCRAM-SHA-1"
 }

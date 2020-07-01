@@ -50,13 +50,14 @@ func InitJobMgr() (err error) {
 	}
 	// 启动任务监听
 	G_JobMgr.watchJobs()
-	for {
-		time.Sleep(time.Second * 1)
-	}
+
+	// 启动监听killer
+	G_JobMgr.watchKiller()
+
 	return
 }
 
-func (jobMgr *JobMgr) watchJobs() (err error) {
+func (j *JobMgr) watchJobs() (err error) {
 	var (
 		getResp            *clientv3.GetResponse
 		kvpair             *mvccpb.KeyValue
@@ -68,7 +69,7 @@ func (jobMgr *JobMgr) watchJobs() (err error) {
 		jobName            string
 		jobEvent           *common.JobEvent
 	)
-	if getResp, err = jobMgr.kv.Get(context.TODO(), common.JOB_SAVE_DIR, clientv3.WithPrefix()); err != nil {
+	if getResp, err = j.kv.Get(context.TODO(), common.JOB_SAVE_DIR, clientv3.WithPrefix()); err != nil {
 		return
 	}
 
@@ -85,7 +86,7 @@ func (jobMgr *JobMgr) watchJobs() (err error) {
 	go func() {
 		// 从get时刻的后续版本开始监听
 		watchStartRevision = getResp.Header.Revision + 1
-		watchChan = jobMgr.watcher.Watch(context.TODO(), common.JOB_SAVE_DIR, clientv3.WithRev(watchStartRevision), clientv3.WithPrefix())
+		watchChan = j.watcher.Watch(context.TODO(), common.JOB_SAVE_DIR, clientv3.WithRev(watchStartRevision), clientv3.WithPrefix())
 
 		for wathchResp = range watchChan {
 			for _, watchEvent = range wathchResp.Events {
@@ -110,5 +111,42 @@ func (jobMgr *JobMgr) watchJobs() (err error) {
 			}
 		}
 	}()
+	return
+}
+
+// 监听强杀事件
+func (j *JobMgr) watchKiller() (err error) {
+	var (
+		job        *common.Job
+		watchChan  clientv3.WatchChan
+		wathchResp clientv3.WatchResponse
+		watchEvent *clientv3.Event
+		jobName    string
+		jobEvent   *common.JobEvent
+	)
+
+	go func() {
+		// 监听/cron/killer 目录
+		watchChan = j.watcher.Watch(context.TODO(), common.JOB_KILL_DIR, clientv3.WithPrefix())
+		for wathchResp = range watchChan {
+			for _, watchEvent = range wathchResp.Events {
+				switch watchEvent.Type {
+				case mvccpb.PUT: // 杀死某个任务事件
+					jobName = common.ExtractKillerName(string(watchEvent.Kv.Key))
+					job = &common.Job{Name: jobName}
+					jobEvent = common.BuildJobEvent(common.JOB_EVENT_KILL, job)
+					G_Scheduler.PushJobEvent(jobEvent)
+				case mvccpb.DELETE: // killer 标记过期，自动删除
+				}
+			}
+		}
+	}()
+	return
+}
+
+// 创建任务执行锁
+func (j *JobMgr) CreateJobLock(jobName string) (jobLock *JobLock) {
+	// 返回一把锁
+	jobLock = InitJobLock(jobName, j.kv, j.lease)
 	return
 }
