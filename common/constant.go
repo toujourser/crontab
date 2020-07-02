@@ -7,4 +7,5 @@ const (
 	JOB_EVENT_DELETE = 2             // 删除任务事件
 	JOB_EVENT_KILL   = 3             // 强杀任务事件
 	JOB_LOCK_DIR     = "/cron/lock/" // 任务锁路径
+	JOB_WORKER_DIR = "/cron/workers/"
 )

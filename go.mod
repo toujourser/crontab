@@ -16,7 +16,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/spf13/cast v1.3.1
 	go.etcd.io/etcd v3.3.22+incompatible
-	go.mongodb.org/mongo-driver v1.3.4 // indirect
+	go.mongodb.org/mongo-driver v1.3.4
 	go.uber.org/zap v1.15.0 // indirect
 	golang.org/x/crypto v0.0.0-20200604202706-70a84ac30bf9 // indirect
 	golang.org/x/net v0.0.0-20200602114024-627f9648deb9 // indirect

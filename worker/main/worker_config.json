@@ -1,0 +1,13 @@
+{
+  "etcdEndPoints": [
+    "127.0.0.1:2379"
+  ],
+  "etcdDialTimeout": 5000,
+  "mongodbURI": "mongodb://crontab:xxx@127.0.0.1:27017/crontab_db?authMechanism=SCRAM-SHA-1",
+  "mongodbTimeout": 10,
+  "jogLogBatchSize": 100,
+  "日志自动提交超时": "在批次未达到阈值之前,超时会自动提交batch",
+  "jobLogCommitTimeout": 1000,
+  "mongo_database": "crontab_db",
+  "mongo_collection": "log"
+}

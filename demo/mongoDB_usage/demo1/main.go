@@ -20,7 +20,7 @@ func main() {
 		err        error
 	)
 	ctx, _ = context.WithTimeout(context.Background(), 10*time.Second)
-	if client, err = mongo.Connect(ctx, options.Client().ApplyURI("mongodb://crontab:goodluck@192.168.255.129:27017/crontab_db?authMechanism=SCRAM-SHA-1")); err != nil {
+	if client, err = mongo.Connect(ctx, options.Client().ApplyURI("mongodb://crontab:goodluck@127.0.0.1:27017/crontab_db?authMechanism=SCRAM-SHA-1")); err != nil {
 		log.Println(err)
 		return
 	}

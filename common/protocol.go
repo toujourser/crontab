@@ -62,8 +62,14 @@ func ExtractJobName(jobKey string) string {
 
 // 从 etcd 的key中提取任务名
 // /cron/kill/job10 抹掉 /cron/kill/
-func ExtractKillerName(kullerKey string) string {
-	return strings.TrimPrefix(kullerKey, JOB_KILL_DIR)
+func ExtractKillerName(killerKey string) string {
+	return strings.TrimPrefix(killerKey, JOB_KILL_DIR)
+}
+
+// 从 etcd 的key中提取ip
+// /cron/worker/192.168.235.23 抹掉 /cron/worker/
+func ExtractWorkerIp(regKey string) string {
+	return strings.TrimPrefix(regKey, JOB_WORKER_DIR)
 }
 
 type JobEvent struct {

@@ -1,0 +1,16 @@
+{
+  "apiPort": 8070,
+  "apiReadTimeout": 5000,
+  "apiWriteTimeout": 5000,
+  "etcdEndPoints": [
+    "127.0.0.1:2379"
+  ],
+  "etcdDialTimeout": 5000,
+  "webroot": "/Users/xxx/Documents/study/go/crontab/master/web/static",
+  "mongodbURI": "mongodb://crontab:xxx@127.0.0.1:27017/crontab_db?authMechanism=SCRAM-SHA-1",
+  "mongodbTimeout": 10,
+  "mongo_database": "crontab_db",
+  "mongo_collection": "log"
+}
+
+

@@ -57,6 +57,7 @@
     </div>
 </div>
 
+<!-- 任务编辑模态框 -->
 <div id="edit-modal" class="modal fade" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -87,6 +88,50 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
                 <button type="button" class="btn btn-primary" id="save-job">保存</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+<!-- 日志模态框 -->
+<div id="log-modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document" style="width:1200px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">任务日志</h4>
+            </div>
+            <div class="modal-body">
+                <table id="job-log-list" class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>shell命令</th>
+                        <th>脚本输出</th>
+                        <th>计划开始时间</th>
+                        <th>实际调度时间</th>
+                        <th>任务开始时间</th>
+                        <th>任务结束时间</th>
+                        <th>错误原因</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="job-command">echo hello</td>
+                        <td class="job-name">no message</td>
+                        <td class="job-cronExpr"> tom and jerry</td>
+                        <td class="job-cronExpr"> ----------</td>
+                        <td class="job-cronExpr"> ==========</td>
+                        <td class="job-cronExpr"> ++++++++++</td>
+                        <td class="job-cronExpr"> **********</td>
+
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
@@ -124,7 +169,7 @@
         })
 
         // 强杀任务
-        $('#job-list').on("click", ".kill-job", function (event) {
+        $("#job-list").on("click", ".kill-job", function (event) {
             var jobName = $(this).parents('tr').children('.job-name').text()
             $.ajax({
                 url: '/job/kill',
@@ -142,7 +187,7 @@
             })
         })
         //  更新任务
-        $('#save-job').on('click', function () {
+        $("#save-job").on('click', function () {
             var jobInfo = {
                 name: $('#edit-name').val(),
                 command: $('#edit-command').val(),
@@ -168,6 +213,56 @@
             $('#edit-modal').modal('show')
         })
 
+        $("#job-list").on("click", ".job-log", function (event) {
+            // $('#edit-name').val($(this).parents('tr').children('.job-name').text())
+            // $('#edit-command').val($(this).parents('tr').children('.job-command').text())
+            // $('#edit-cronExpr').val($(this).parents('tr').children('.job-cronExpr').text())
+            // $('#edit-name').attr('disabled', 'disabled')
+            var jobName = $(this).parents('tr').children('.job-name').text()
+            var url = "/job/logs?jobName=" + jobName
+            console.log(jobName)
+            $.ajax({
+                url: url,
+                dataType: "json",
+                success: function (resp) {
+                    if (resp.errno !== 0) {
+                        return null
+                    }
+                    console.log(resp)
+                    var logList = resp.data
+                    $("#log-modal tbody").empty()
+
+                    for (var i = 0; i < logList.length; i++) {
+                        var log = logList[i]
+                        var tr = $("<tr>")
+                        tr.append($('<td class="job-command">').html(log.Command))
+                        tr.append($('<td class="job-Output">').html(log.Output))
+                        tr.append($('<td class="job-PlanTime">').html(timestampToTime(log.PlanTime)))
+                        tr.append($('<td class="job-ScheduleTime`">').html(timestampToTime(log.ScheduleTime)))
+                        tr.append($('<td class="job-StartTime">').html(timestampToTime(log.StartTime)))
+                        tr.append($('<td class="job-EndTime">').html(timestampToTime(log.EndTime)))
+                        tr.append($('<td class="job-errmsg">').html(log.Err))
+                        $("#log-modal tbody").append(tr)
+                    }
+                }
+            })
+
+            // 弹出模态框
+            $('#log-modal').modal('show')
+        })
+
+        //将时间戳转换成正常时间格式
+        function timestampToTime(timestamp) {
+            var date = new Date(timestamp);//时间戳为10位需*1000，时间戳为13位的话不需乘1000
+            var Y = date.getFullYear() + '-';
+            var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
+            var D = date.getDate() + ' ';
+            var h = date.getHours() + ':';
+            var m = date.getMinutes() + ':';
+            var s = date.getSeconds();
+            return Y + M + D + h + m + s;
+        }
+
         // 页面初始化加载数据
         function rebuildJobList(resp) {
             $.ajax({
@@ -191,6 +286,7 @@
                             .append('<button class="btn btn-info edit-job">编辑</button>')
                             .append('<button class="btn btn-danger delete-job">删除</button> ')
                             .append('<button class="btn btn-warning kill-job">强杀</button>  ')
+                            .append('<button class="btn btn-success job-log">日志</button>  ')
                         tr.append($('<td>').append(toolbar))
                         $("#job-list tbody").append(tr)
                     }
