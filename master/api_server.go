@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/spf13/cast"
@@ -129,6 +130,30 @@ ERR:
 	}
 }
 
+func handleJobLogs(resp http.ResponseWriter, req *http.Request) {
+	var (
+		jobName string
+		bytes   []byte
+		logs    []*common.JobLog
+		err     error
+	)
+
+	jobName = strings.Split(strings.Split(req.RequestURI, "?")[1], "=")[1]
+	if logs, err = G_logSink.GetLogs(jobName); err != nil {
+		goto ERR
+	}
+
+	if bytes, err = common.BuildResponse(0, "success", logs); err == nil {
+		resp.Write(bytes)
+	}
+	return
+
+ERR:
+	if bytes, err = common.BuildResponse(-1, err.Error(), nil); err == nil {
+		resp.Write(bytes)
+	}
+}
+
 func InitApiServer() (err error) {
 	var (
 		mux          *http.ServeMux
@@ -142,6 +167,7 @@ func InitApiServer() (err error) {
 	mux.HandleFunc("/job/delete", handleJobDelete)
 	mux.HandleFunc("/job/list", handleJobList)
 	mux.HandleFunc("/job/kill", handleJobKill)
+	mux.HandleFunc("/job/logs", handleJobLogs)
 
 	staticDir = http.Dir(G_config.WebRoot)
 	staticHandle = http.FileServer(staticDir)

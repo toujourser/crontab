@@ -13,8 +13,8 @@ var (
 )
 
 func initArgs() {
-	// worker -config ./worker.json
-	flag.StringVar(&configFile, "config", "worker/main/worker.json", "指定配置文件地址")
+	// worker -config ./worker_config.json
+	flag.StringVar(&configFile, "config", "worker/main/worker_config.json", "指定配置文件地址")
 	flag.Parse()
 }
 

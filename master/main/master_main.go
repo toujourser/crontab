@@ -12,7 +12,7 @@ var (
 )
 
 func initArgs() {
-	flag.StringVar(&configFile, "config", "D:\\study\\proj\\go_pro\\crontab\\master\\main\\config.json", "指定配置文件地址")
+	flag.StringVar(&configFile, "config", "master/main/master_config.json", "指定配置文件地址")
 	flag.Parse()
 }
 
@@ -27,6 +27,9 @@ func main() {
 	initArgs()
 	initEnv()
 	if err = master.InitConfig(configFile); err != nil {
+		goto ERR
+	}
+	if err = master.InitLogSink(); err != nil {
 		goto ERR
 	}
 	if err = master.InitJobMgr(); err != nil {

@@ -84,7 +84,7 @@ func InitLogSink() (err error) {
 	}
 	G_logSink = &LogSink{
 		client:         client,
-		logCollection:  client.Database("crontab_db").Collection("log"),
+		logCollection:  client.Database(G_config.MongoDatabase).Collection(G_config.MongoCollection),
 		logChan:        make(chan *common.JobLog, 1000),
 		autoCommitChan: make(chan *common.LogBatch, 1000),
 	}
