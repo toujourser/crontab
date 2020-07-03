@@ -20,12 +20,13 @@
     <dib class="row">
         <div class="col-md-12">
             <button class="btn btn-primary" id="new-job">新建任务</button>
+            <button class="btn btn-success" id="list-worker">健康节点</button>
         </div>
     </dib>
 
     <div class="row">
         <div class="col-md-12">
-            <div class="panel panel-default" style="margin-top: 20px">
+            <div class="panel panel-default" style="margin-top: 10px">
                 <div class="panel-body">
                     <table id="job-list" class="table table-striped">
                         <thead>
@@ -137,6 +138,37 @@
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
+
+<!-- 健康节点模态框 -->
+<div id="worker-modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">健康节点</h4>
+            </div>
+            <div class="modal-body">
+                <table id="worker-list" class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>节点IP</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="worker-ip">127.0.0.1</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
 <script>
     $(document).ready(function () {
         $('#job-list').on("click", ".edit-job", function (event) {
@@ -213,11 +245,33 @@
             $('#edit-modal').modal('show')
         })
 
+        // 健康节点
+        $('#list-worker').on('click', function () {
+            $.ajax({
+                url: "/worker/list",
+                dataType: "json",
+                success: function (resp) {
+                    if (resp.errno !== 0) {
+                        return null
+                    }
+                    var workerList = resp.data
+                    $("#worker-modal tbody").empty()
+
+                    for (var i = 0; i < workerList.length; i++) {
+                        var work = workerList[i]
+                        console.log(work)
+                        var tr = $("<tr>")
+                        tr.append($('<td class="worker-ip">').html(work))
+                        $("#worker-modal tbody").append(tr)
+                    }
+                }
+            })
+
+            $('#worker-modal').modal('show')
+        })
+
+        // 任务日志
         $("#job-list").on("click", ".job-log", function (event) {
-            // $('#edit-name').val($(this).parents('tr').children('.job-name').text())
-            // $('#edit-command').val($(this).parents('tr').children('.job-command').text())
-            // $('#edit-cronExpr').val($(this).parents('tr').children('.job-cronExpr').text())
-            // $('#edit-name').attr('disabled', 'disabled')
             var jobName = $(this).parents('tr').children('.job-name').text()
             var url = "/job/logs?jobName=" + jobName
             console.log(jobName)
