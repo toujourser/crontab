@@ -8,7 +8,7 @@
 >
 > * 追踪任务执行状态，采集任务输出，可视化log查看
 
-
+![avatar](https://github.com/toujourser/crontab/blob/master/master/web/static/crontab.png?raw=true)
 
 ## Installation
 
