@@ -26,16 +26,24 @@ func main() {
 	)
 	initArgs()
 	initEnv()
+	// 初始化配置
 	if err = master.InitConfig(configFile); err != nil {
 		goto ERR
 	}
-	if err = master.InitLogSink(); err != nil {
+
+	// 初始化服务发现模块
+	if err = master.InitWorkerMgr(); err != nil {
 		goto ERR
 	}
+	// 初始化日志管理器
+	if err = master.InitLogMgr(); err != nil {
+		goto ERR
+	}
+	// 初始化任务管理器
 	if err = master.InitJobMgr(); err != nil {
 		goto ERR
 	}
-
+	// 初始化web api
 	if err = master.InitApiServer(); err != nil {
 		goto ERR
 	}

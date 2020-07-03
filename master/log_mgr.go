@@ -22,7 +22,7 @@ var (
 	G_logSink *LogSink
 )
 
-func InitLogSink() (err error) {
+func InitLogMgr() (err error) {
 	var (
 		client *mongo.Client
 		ctx    context.Context
@@ -48,19 +48,20 @@ type findByJobName struct {
 	JobName string `bson:"job_name"`
 }
 
-func (l *LogSink) GetLogs(jobName string) (jobLog []*common.JobLog, err error) {
+func (l *LogSink) GetLogs(jobName string, skip, limit int64) (jobLog []*common.JobLog, err error) {
 	var (
 		cursor      *mongo.Cursor
 		findoptions options.FindOptions
 		cond        *findByJobName
 	)
 
+	jobLog = make([]*common.JobLog, 0)
 	cond = &findByJobName{
 		JobName: jobName,
 	}
 
-	findoptions.SetSkip(0)
-	findoptions.SetLimit(5)
+	findoptions.SetSkip(skip)
+	findoptions.SetLimit(limit)
 	findoptions.SetSort(bson.D{{"start_time", -1}})
 	if cursor, err = l.logCollection.Find(context.TODO(), cond, &findoptions); err != nil {
 		log.Println(err.Error())

@@ -48,6 +48,10 @@ func main() {
 		goto ERR
 	}
 
+	if err = worker.InitRegister(); err != nil {
+		goto ERR
+	}
+
 	// 初始化任务调度器
 	if err = worker.InitJobMgr(); err != nil {
 		goto ERR
